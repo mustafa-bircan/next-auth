@@ -1,26 +1,25 @@
-import { NextRequest } from "next/server";
-import { JWT } from "next-auth/jwt";
+import { withAuth } from "next-auth/middleware";
+import { NextResponse } from "next/server";
 
-declare module "next-auth" {
-    interface Session {
-        user: {
-            role?: "admin" | "user";
-            email?: string;
-            name?: string;
-        };
-        accessToken?: string;
-    }
+export default withAuth(
+    function middleware(req) {
+        const token = req.nextauth.token;
 
-    interface JWT {
-        accessToken?: string;
-        role?: "admin" | "user";
-    }
-}
+        if (!token) {
+            return NextResponse.redirect(new URL("/login", req.url));
+        }
 
-declare module "next/server" {
-    interface NextRequest {
-        nextauth: {
-            token: JWT;
-        };
+        if (req.nextUrl.pathname.startsWith("/admin") && token.role !== "admin") {
+            return NextResponse.redirect(new URL("/", req.url));
+        }
+
+        return NextResponse.next();
+    },
+    {
+        callbacks: { authorized: ({ token }) => !!token },
     }
-}
+);
+
+export const config = {
+    matcher: ["/admin/:path*", "/protected/:path*"],
+};
