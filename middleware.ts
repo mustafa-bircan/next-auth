@@ -13,6 +13,15 @@ export default withAuth(
             return NextResponse.redirect(new URL("/", req.url));
         }
 
+        if (req.nextUrl.pathname === "/admin-panel" && token.role !== "admin") {
+            return NextResponse.redirect(new URL("/", req.url));
+        }
+
+        if (req.nextUrl.pathname === "/user-zone" && token.role !== "user" && token.role !== "admin") {
+            return NextResponse.redirect(new URL("/", req.url));
+        }
+
+
         return NextResponse.next();
     },
     {
@@ -21,5 +30,6 @@ export default withAuth(
 );
 
 export const config = {
-    matcher: ["/admin/:path*", "/protected/:path*"],
+    matcher: ["/admin/:path*", "/admin-panel", "/user-zone"],
 };
+
