@@ -1,19 +1,21 @@
-import { NextRequest } from "next/server";
-import { JWT } from "next-auth/jwt";
+import "next-auth";
+import "next-auth/jwt";
 
 declare module "next-auth" {
     interface Session {
         user: {
-            role?: "admin" | "user";
-            email?: string;
             name?: string;
+            email?: string;
+            role: "admin" | "user";
         };
         accessToken?: string;
     }
+}
 
+declare module "next-auth/jwt" {
     interface JWT {
+        role: "admin" | "user";
         accessToken?: string;
-        role?: "admin" | "user";
     }
 }
 
