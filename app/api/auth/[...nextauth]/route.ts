@@ -18,6 +18,9 @@ const authOptions: NextAuthOptions = {
             if (user) {
                 token.role = user.email === "admin@example.com" ? "admin" : "user";
             }
+            if (!token.role) {
+                token.role = "user";
+            }
             return token;
         },
         async session({ session, token }) {
